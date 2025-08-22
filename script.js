@@ -5,3 +5,18 @@ const words = [
   { foreign: "water", translation: "вода", example: "Drink more water." },
   { foreign: "friend", translation: "друг", example: "He is my best friend." }
 ];
+
+const flipCard = document.querySelector(".flip-card"); 
+const cardFront = document.querySelector("#card-front h1"); 
+const cardBack = document.querySelector("#card-back h1");   
+const cardExample = document.querySelector("#card-back span"); 
+
+const currentWordSpan = document.getElementById("current-word");
+const totalWordSpan = document.getElementById("total-word");
+const progressBar = document.getElementById("words-progress");
+
+const btnBack = document.getElementById("back");
+const btnNext = document.getElementById("next");
+const btnExam = document.getElementById("exam");
+
+let currentIndex = 0;
