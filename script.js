@@ -101,5 +101,5 @@ function makeWordsShuffled(words) {
 };
 
 shuffleWords.addEventListener("click", () => {
-
+    makeWordsShuffled(words);
 };
