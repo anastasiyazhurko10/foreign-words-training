@@ -104,4 +104,5 @@ shuffleWords.addEventListener("click", () => {
     makeWordsShuffled(words);
     currentIndex = 0;
     showWord(currentIndex);
-};
+    updateNavigationButtons();
+});
