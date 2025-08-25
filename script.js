@@ -87,3 +87,5 @@ function updateNavigationButtons() {
     nextButton.disabled = false;
   };
 };
+
+showWord(currentIndex);
