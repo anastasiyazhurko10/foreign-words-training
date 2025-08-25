@@ -99,3 +99,7 @@ function makeWordsShuffled(words) {
     [words[i], words[j]] = [words[j], words[i]];
   }
 };
+
+shuffleWords.addEventListener("click", () => {
+
+};
