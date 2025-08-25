@@ -66,4 +66,6 @@ function showWord(index) {
     cardFront.textContent = word.front;
     cardBack.textContent = word.back;
     cardExample.textContent = word.example;
+    currentWordSpan.textContent = index + 1;
+    totalWordSpan.textContent = words.length;
 }
