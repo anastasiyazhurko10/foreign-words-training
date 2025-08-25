@@ -145,5 +145,5 @@ examButton.addEventListener("click", () => {
 });
 
 function startMatchingTest() {
-
+    const cards = [];
 };
