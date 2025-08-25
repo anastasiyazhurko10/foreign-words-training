@@ -69,4 +69,7 @@ function showWord(index) {
     currentWordSpan.textContent = index + 1;
     totalWordSpan.textContent = words.length;
     wordProgress.value = (index / words.length) * 100;
-}
+};
+
+const backButton = document.getElementById("back");
+const nextButton = document.getElementById("next");
