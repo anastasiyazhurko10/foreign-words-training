@@ -90,3 +90,5 @@ function updateNavigationButtons() {
 
 showWord(currentIndex);
 updateNavigationButtons();
+
+const shuffleWords = document.getElementById("shuffle-words"); 
