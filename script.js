@@ -89,3 +89,4 @@ function updateNavigationButtons() {
 };
 
 showWord(currentIndex);
+updateNavigationButtons();
