@@ -1,22 +1,52 @@
 const words = [
-  { foreign: "apple", translation: "яблоко", example: "I eat an apple every day." },
-  { foreign: "book", translation: "книга", example: "She is reading a book." },
-  { foreign: "sun", translation: "солнце", example: "The sun is shining." },
-  { foreign: "water", translation: "вода", example: "Drink more water." },
-  { foreign: "friend", translation: "друг", example: "He is my best friend." }
+  {
+    front: "achieve",
+    back: "достигать",
+    example: "She worked hard to achieve her goals."
+  },
+  {
+    front: "comfortable",
+    back: "удобный, комфортный",
+    example: "This sofa is very comfortable to sit on."
+  },
+  {
+    front: "decision",
+    back: "решение",
+    example: "It was a difficult decision to make."
+  },
+  {
+    front: "experience",
+    back: "опыт",
+    example: "He has a lot of experience in marketing."
+  },
+  {
+    front: "improve",
+    back: "улучшать",
+    example: "I want to improve my English skills."
+  },
+  {
+    front: "journey",
+    back: "путешествие, поездка",
+    example: "The journey took more than five hours."
+  },
+  {
+    front: "opportunity",
+    back: "возможность",
+    example: "This job is a great opportunity for me."
+  },
+  {
+    front: "suggest",
+    back: "предлагать",
+    example: "Can you suggest a good restaurant nearby?"
+  },
+  {
+    front: "responsible",
+    back: "ответственный",
+    example: "She is responsible for managing the team."
+  },
+  {
+    front: "prepare",
+    back: "готовиться, подготавливать",
+    example: "He needs to prepare for the exam tomorrow."
+  }
 ];
-
-const flipCard = document.querySelector(".flip-card"); 
-const cardFront = document.querySelector("#card-front h1"); 
-const cardBack = document.querySelector("#card-back h1");   
-const cardExample = document.querySelector("#card-back span"); 
-
-const currentWordSpan = document.getElementById("current-word");
-const totalWordSpan = document.getElementById("total-word");
-const progressBar = document.getElementById("words-progress");
-
-const btnBack = document.getElementById("back");
-const btnNext = document.getElementById("next");
-const btnExam = document.getElementById("exam");
-
-let currentIndex = 0;
