@@ -114,5 +114,10 @@ flipCard.addEventListener("click", () => {
 });
 
 backButton.addEventListener("click", () => {
-
+    if (currentIndex > 0) {
+        currentIndex--;
+        showWord(currentIndex);
+        updateNavigationButtons();
+        flipCard.classList.remove("active");
+    }
 });
