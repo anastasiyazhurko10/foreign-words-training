@@ -50,3 +50,5 @@ const words = [
     example: "He needs to prepare for the exam tomorrow."
   }
 ];
+
+let currentIndex = 0;
