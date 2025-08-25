@@ -146,4 +146,7 @@ examButton.addEventListener("click", () => {
 
 function startMatchingTest() {
     const cards = [];
+    words.forEach((word, index) => {
+        
+    })
 };
