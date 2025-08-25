@@ -136,3 +136,10 @@ const examMode = document.getElementById("exam-mode");
 const studyMode = document.getElementById("study-mode");
 const studyCards = document.querySelector(".study-cards");
 const examCards = document.getElementById("exam-cards");
+
+examButton.addEventListener("click", () => {
+  studyMode.classList.add("hidden");
+  examMode.classList.remove("hidden");
+  studyCards.classList.add("hidden");
+  examCards.textContent = "Режим тестирования";
+});
