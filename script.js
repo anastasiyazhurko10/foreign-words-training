@@ -73,3 +73,17 @@ function showWord(index) {
 
 const backButton = document.getElementById("back");
 const nextButton = document.getElementById("next");
+
+function updateNavigationButtons() {
+  if (currentIndex === 0) {
+    backButton.disabled = true
+  } else {
+    backButton.disabled = false;
+  };
+  
+  if (currentIndex === words.length - 1) {
+    nextButton.disabled = true;
+  } else {
+    nextButton.disabled = false;
+  };
+};
