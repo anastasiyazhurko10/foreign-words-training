@@ -63,4 +63,7 @@ const wordProgress = document.getElementById("words-progress");
 
 function showWord(index) {
     const word = words[index];
+    cardFront.textContent = word.front;
+    cardBack.textContent = word.back;
+    cardExample.textContent = word.example;
 }
