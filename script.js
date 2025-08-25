@@ -130,3 +130,9 @@ nextButton.addEventListener("click", () => {
     flipCard.classList.remove("active")
 }
 });
+
+const examButton = document.getElementById("exam");
+const examMode = document.getElementById("exam-mode");
+const studyMode = document.getElementById("study-mode");
+const studyCards = document.querySelector(".study-cards");
+const examCards = document.getElementById("exam-cards");
