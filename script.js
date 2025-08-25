@@ -121,3 +121,12 @@ backButton.addEventListener("click", () => {
         flipCard.classList.remove("active");
     }
 });
+
+nextButton.addEventListener("click", () => {
+  if (currentIndex < words.length - 1) {
+    currentIndex++;
+    showWord(currentIndex);
+    updateNavigationButtons();
+    flipCard.classList.remove("active")
+}
+});
