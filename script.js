@@ -52,3 +52,7 @@ const words = [
 ];
 
 let currentIndex = 0;
+
+const cardFront = document.getElementById("card-front").querySelector("h1");
+const cardBack = document.getElementById("card-back").querySelector("h1");
+const cardExample = document.getElementById("card-back").querySelector("span");
