@@ -143,3 +143,7 @@ examButton.addEventListener("click", () => {
   studyCards.classList.add("hidden");
   examCards.textContent = "Режим тестирования";
 });
+
+function startMatchingTest() {
+
+};
