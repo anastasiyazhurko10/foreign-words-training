@@ -108,3 +108,7 @@ shuffleWords.addEventListener("click", () => {
 });
 
 const flipCard = document.querySelector(".flip-card");
+
+flipCard.addEventListener("click", () => {
+  flipCard.classList.toggle("active");
+});
