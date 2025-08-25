@@ -68,4 +68,5 @@ function showWord(index) {
     cardExample.textContent = word.example;
     currentWordSpan.textContent = index + 1;
     totalWordSpan.textContent = words.length;
+    wordProgress.value = (index / words.length) * 100;
 }
