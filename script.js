@@ -56,3 +56,7 @@ let currentIndex = 0;
 const cardFront = document.getElementById("card-front").querySelector("h1");
 const cardBack = document.getElementById("card-back").querySelector("h1");
 const cardExample = document.getElementById("card-back").querySelector("span");
+
+const currentWordSpan = document.getElementById("current-word");
+const totalWordSpan = document.getElementById("total-word");
+const wordProgress = document.getElementById("words-progress");
