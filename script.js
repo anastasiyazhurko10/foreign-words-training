@@ -157,3 +157,7 @@ cards.sort(() => Math.random() - 0.5);
 examCards.innerHTML = "";
 
 const cardElements = new Map();
+
+for (let i = 0; i < cards.length; i++) {
+    
+}
