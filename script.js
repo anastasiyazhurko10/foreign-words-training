@@ -160,4 +160,5 @@ const cardElements = new Map();
 
 for (let i = 0; i < cards.length; i++) {
     const currentCard = cards[i];
+    const div = document.createElement("div");
 }
