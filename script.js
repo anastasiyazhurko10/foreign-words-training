@@ -151,3 +151,5 @@ function startMatchingTest() {
         cards.push({ type: "translation", value: word.back, newIndex: index})
     })
 };
+
+cards.sort(() => Math.random() - 0.5);
