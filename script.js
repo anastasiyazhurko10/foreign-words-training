@@ -175,5 +175,8 @@ examCards.addEventListener("click", (e) => {
     const clicked = e.target;
     if (!clicked.classList.contains("card") || clicked.classList.contains("fade-out")) {
         return;
-    }
+    };
+    if (clicked === firstCard || clicked === secondCard) {
+        return;
+    };
 })
