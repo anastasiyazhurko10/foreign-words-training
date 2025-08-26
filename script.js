@@ -153,3 +153,5 @@ function startMatchingTest() {
 };
 
 cards.sort(() => Math.random() - 0.5);
+
+examCards.innerHTML = "";
