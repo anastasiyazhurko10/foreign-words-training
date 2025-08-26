@@ -173,4 +173,7 @@ function setupMatchingLogic(cards) {
 
 examCards.addEventListener("click", (e) => {
     const clicked = e.target;
+    if (!clicked.classList.contains("card") || clicked.classList.contains("fade-out")) {
+        return;
+    }
 })
