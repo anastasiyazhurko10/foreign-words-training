@@ -163,4 +163,5 @@ for (let i = 0; i < cards.length; i++) {
     const div = document.createElement("div");
     div.classList.add("card", "face-down");
     examCards.appendChild(div);
+    cardElements.set(div, currentCard);
 }
