@@ -159,5 +159,5 @@ examCards.innerHTML = "";
 const cardElements = new Map();
 
 for (let i = 0; i < cards.length; i++) {
-    
+    const currentCard = cards[i];
 }
