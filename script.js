@@ -169,4 +169,8 @@ for (let i = 0; i < cards.length; i++) {
 function setupMatchingLogic(cards) {
     let firstCard = null;
     let secondCard = null;
-}
+};
+
+examCards.addEventListener("click", (e) => {
+    const clicked = e.target;
+})
