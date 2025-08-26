@@ -164,4 +164,9 @@ for (let i = 0; i < cards.length; i++) {
     div.classList.add("card", "face-down");
     examCards.appendChild(div);
     cardElements.set(div, currentCard);
+};
+
+function setupMatchingLogic(cards) {
+    let firstCard = null;
+    let secondCard = null;
 }
