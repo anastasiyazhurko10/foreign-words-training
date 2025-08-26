@@ -1,3 +1,5 @@
+'use strict';
+
 const words = [
   {
     front: "achieve",
@@ -53,9 +55,9 @@ const words = [
 
 let currentIndex = 0;
 
-const cardFront = document.getElementById("card-front").querySelector("h1");
-const cardBack = document.getElementById("card-back").querySelector("h1");
-const cardExample = document.getElementById("card-back").querySelector("span");
+const cardFront = document.querySelector("#card-front h1");
+const cardBack = document.querySelector("#card-back h1");
+const cardExample = document.querySelector("#card-back span");
 
 const currentWordSpan = document.getElementById("current-word");
 const totalWordSpan = document.getElementById("total-word");
@@ -142,41 +144,105 @@ examButton.addEventListener("click", () => {
   examMode.classList.remove("hidden");
   studyCards.classList.add("hidden");
   examCards.textContent = "Режим тестирования";
+
+  startMatchingTest();
 });
+
+function createExamCard(card) {
+  const div = document.createElement("div");
+  div.classList.add("card", "face-down");
+  div.textContent = card.value;
+  return div;
+};
 
 function startMatchingTest() {
     const cards = [];
     words.forEach((word, index) => {
-        cards.push({ type: "word", value: word.front, newIndex: index});
-        cards.push({ type: "translation", value: word.back, newIndex: index})
-    })
+        cards.push({ type: "word", value: word.front, newIndex: index });
+        cards.push({ type: "translation", value: word.back, newIndex: index });
+    });
+
+    const cardElements = new Map();
+
+    cards.sort(() => Math.random() - 0.5);
+    examCards.innerHTML = "";
+    
+    const fragment = document.createDocumentFragment();
+    cards.forEach(card => {
+        const div = createExamCard(card);
+        fragment.appendChild(div);
+        cardElements.set(div, card);
+    });
+    
+    examCards.appendChild(fragment);
+
+    setupMatchingLogic(cardElements);
 };
 
-cards.sort(() => Math.random() - 0.5);
-
-examCards.innerHTML = "";
-
-const cardElements = new Map();
-
-for (let i = 0; i < cards.length; i++) {
-    const currentCard = cards[i];
-    const div = document.createElement("div");
-    div.classList.add("card", "face-down");
-    examCards.appendChild(div);
-    cardElements.set(div, currentCard);
-};
 
 function setupMatchingLogic(cards) {
     let firstCard = null;
     let secondCard = null;
-};
+    let lock = false;
+    
+    examCards.addEventListener("click", (e) => {
+        if (lock) {
+            return;
+        }
+        const clicked = e.target;
+        if (!clicked.classList.contains("card") || clicked.classList.contains("fade-out")) {
+            return;
+        };
+        if (clicked === firstCard || clicked === secondCard) {
+            return;
+        };
 
-examCards.addEventListener("click", (e) => {
-    const clicked = e.target;
-    if (!clicked.classList.contains("card") || clicked.classList.contains("fade-out")) {
-        return;
+        clicked.classList.remove("face-down");
+        clicked.classList.add("correct");
+
+        if (!firstCard) {
+            firstCard = clicked;
+            return;
+        }
+
+        secondCard = clicked;
+        lock = true;
+
+        const firstData = cardElements.get(firstCard);
+        const secondData = cardElements.get(secondCard);
+
+        if (firstData.newIndex === secondData.newIndex && firstData.type !== secondData.type) {
+            setTimeout(() => {
+                firstCard.classList.add("fade-out");
+                secondCard.classList.add("fade-out");
+                resetSelection();
+                checkCompletion();
+            }, 300);
+        } else {
+            secondCard.classList.add("wrong");
+            setTimeout(() => {
+                secondCard.classList.remove("wrong");
+                firstCard.classList.remove("correct");
+                secondCard.classList.remove("correct");
+                secondCard.classList.add("face-down");
+                firstCard.classList.add("face-down");
+                resetSelection();
+            }, 500);
+        }
+    });
+
+    function resetSelection() {
+        firstCard = null;
+        secondCard = null;
+        lock = false;
     };
-    if (clicked === firstCard || clicked === secondCard) {
-        return;
-    };
-})
+
+    function checkCompletion() {
+        const remaining = [...examCards.children].filter(card => !card.classList.contains("fade-out"));
+        if (remaining.length === 0) {
+            setTimeout(() => {
+                alert("Поздравляем! Вы успешны завершили проверку знаний");
+            }, 300);
+        }
+    }
+};

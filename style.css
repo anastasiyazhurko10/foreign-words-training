@@ -275,3 +275,20 @@ progress {
     opacity: 0;
   }
 }
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.card.fade-out {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.card.wrong {
+  background-color: #ff4d4d;
+}
+
+.card.correct {
+  background-color: #a0e7a0;
+}
