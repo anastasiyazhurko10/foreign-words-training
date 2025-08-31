@@ -59,10 +59,10 @@ let startTime = 0;
 let examCardsData = [];
 let firstCard = null;
 let secondCard = null;
-let lock = false;
+let isLocked = false;
 let matchedPairs = 0;
 let attempts = [];
-let examActive = false;
+let isExamActive = false;
 
 const cardFront = document.querySelector("#card-front h1");
 const cardBack = document.querySelector("#card-back h1");
@@ -72,14 +72,14 @@ const totalWordSpan = document.getElementById("total-word");
 const wordProgress = document.getElementById("words-progress");
 const backButton = document.getElementById("back");
 const nextButton = document.getElementById("next");
-const shuffleWords = document.getElementById("shuffle-words");
-const flipCard = document.querySelector(".flip-card");
+const shuffleButton = document.getElementById("shuffle-words");
+const flipCardElement = document.querySelector(".flip-card");
 const examButton = document.getElementById("exam");
 const examMode = document.getElementById("exam-mode");
 const studyMode = document.getElementById("study-mode");
 const studyCards = document.querySelector(".study-cards");
-const examCards = document.getElementById("exam-cards");
-const closeResults = document.getElementById("close-results");
+const examCardsContainer = document.getElementById("exam-cards");
+const closeResultsButton = document.getElementById("close-results");
 
 function showWord(index) {
   const word = words[index];
@@ -97,11 +97,12 @@ function updateNavigationButtons() {
 }
 
 function shuffleWordsArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
-  return array;
+  return newArray;
 }
 
 function createExamCard(value) {
@@ -112,7 +113,7 @@ function createExamCard(value) {
 }
 
 function startMatchingTest() {
-  examActive = true;
+  isExamActive = true;
   resetTimer();
   startTimer();
   
@@ -136,94 +137,100 @@ function startMatchingTest() {
     });
   }
   
-  shuffleWordsArray(examCardsData);
+  examCardsData = shuffleWordsArray(examCardsData);
   
-  examCards.innerHTML = "";
+  examCardsContainer.innerHTML = "";
+  
+  const fragment = document.createDocumentFragment();
   for (let i = 0; i < examCardsData.length; i++) {
-    examCards.appendChild(examCardsData[i].element);
+    fragment.appendChild(examCardsData[i].element);
   }
+  examCardsContainer.appendChild(fragment);
   
   setupMatchingLogic();
 }
 
+function handleCardClick(event) {
+  if (isLocked || !isExamActive) return;
+  
+  const clickedCard = event.target;
+  if (!clickedCard.classList.contains("card") || 
+      clickedCard.classList.contains("fade-out")) {
+    return;
+  }
+  
+  clickedCard.classList.remove("face-down");
+  
+  if (firstCard === null) {
+    firstCard = clickedCard;
+    firstCard.classList.add("correct");
+    return;
+  }
+  
+  if (clickedCard === firstCard) return;
+  
+  secondCard = clickedCard;
+  isLocked = true;
+  
+  let firstData = null;
+  let secondData = null;
+  
+  for (let i = 0; i < examCardsData.length; i++) {
+    if (examCardsData[i].element === firstCard) {
+      firstData = examCardsData[i];
+    }
+    if (examCardsData[i].element === secondCard) {
+      secondData = examCardsData[i];
+    }
+    if (firstData && secondData) break;
+  }
+  
+  if (firstData && secondData && 
+      firstData.index === secondData.index && 
+      firstData.type !== secondData.type) {
+  
+    attempts[firstData.index]++;
+    matchedPairs++;
+    
+    updateExamProgress();
+    
+    setTimeout(() => {
+      firstCard.classList.add("fade-out");
+      secondCard.classList.add("fade-out");
+      resetSelection();
+      checkCompletion();
+    }, 500);
+  } else {
+    
+    if (firstData) attempts[firstData.index]++;
+    secondCard.classList.add("wrong");
+    
+    setTimeout(() => {
+      
+      firstCard.classList.remove("correct");
+      firstCard.classList.add("face-down");
+      
+      secondCard.classList.remove("wrong");
+      secondCard.classList.add("face-down");
+      
+      resetSelection();
+    }, 1000);
+  }
+}
+
 function setupMatchingLogic() {
-  examCards.addEventListener("click", function(e) {
-    if (lock || !examActive) return;
-    
-    const clicked = e.target;
-    if (!clicked.classList.contains("card") || 
-        clicked.classList.contains("fade-out")) {
-      return;
-    }
-    
-    clicked.classList.remove("face-down");
-    
-    if (!firstCard) {
-      firstCard = clicked;
-      firstCard.classList.add("correct");
-      return;
-    }
-    
-    if (clicked === firstCard) return;
-    
-    secondCard = clicked;
-    lock = true;
-    
-    let firstData = null;
-    let secondData = null;
-    
-    for (let i = 0; i < examCardsData.length; i++) {
-      if (examCardsData[i].element === firstCard) {
-        firstData = examCardsData[i];
-      }
-      if (examCardsData[i].element === secondCard) {
-        secondData = examCardsData[i];
-      }
-    }
-    
-    if (firstData && secondData && 
-        firstData.index === secondData.index && 
-        firstData.type !== secondData.type) {
-    
-      attempts[firstData.index]++;
-      matchedPairs++;
-      
-      updateExamProgress();
-      
-      setTimeout(() => {
-        firstCard.classList.add("fade-out");
-        secondCard.classList.add("fade-out");
-        resetSelection();
-        checkCompletion();
-      }, 500);
-    } else {
-      
-      if (firstData) attempts[firstData.index]++;
-      secondCard.classList.add("wrong");
-      
-      setTimeout(() => {
-        
-        firstCard.classList.remove("correct");
-        firstCard.classList.add("face-down");
-        
-        secondCard.classList.remove("wrong");
-        secondCard.classList.add("face-down");
-        
-        resetSelection();
-      }, 1000);
-    }
-  });
+  examCardsContainer.addEventListener("click", handleCardClick);
 }
 
 function resetSelection() {
   firstCard = null;
   secondCard = null;
-  lock = false;
+  isLocked = false;
 }
 
 function checkCompletion() {
   if (matchedPairs === words.length) {
-    examActive = false;
+    isExamActive = false;
     stopTimer();
     setTimeout(() => {
       showResults();
@@ -273,6 +280,7 @@ function showResults() {
   
   content.innerHTML = "";
   
+  const fragment = document.createDocumentFragment();
   for (let i = 0; i < words.length; i++) {
     const template = document.getElementById("word-stats");
     const clone = template.content.cloneNode(true);
@@ -280,8 +288,9 @@ function showResults() {
     clone.querySelector(".word span").textContent = `${words[i].front} - ${words[i].back}`;
     clone.querySelector(".attempts span").textContent = attempts[i];
     
-    content.appendChild(clone);
+    fragment.appendChild(clone);
   }
+  content.appendChild(fragment);
   
   const overlay = document.createElement("div");
   overlay.classList.add("overlay");
@@ -302,24 +311,25 @@ function closeResultsModal() {
   studyMode.classList.remove("hidden");
   examMode.classList.add("hidden");
   studyCards.classList.remove("hidden");
-  examCards.innerHTML = "";
-  examActive = false;
+  examCardsContainer.innerHTML = "";
+  isExamActive = false;
 }
 
 function initApp() {
   showWord(currentIndex);
   updateNavigationButtons();
   
-  shuffleWords.addEventListener("click", () => {
-    shuffleWordsArray(words);
+  shuffleButton.addEventListener("click", () => {
+    const shuffledWords = shuffleWordsArray(words);
+    words.splice(0, words.length, ...shuffledWords);
     currentIndex = 0;
     showWord(currentIndex);
     updateNavigationButtons();
-    flipCard.classList.remove("active");
+    flipCardElement.classList.remove("active");
   });
   
-  flipCard.addEventListener("click", () => {
-    flipCard.classList.toggle("active");
+  flipCardElement.addEventListener("click", () => {
+    flipCardElement.classList.toggle("active");
   });
   
   backButton.addEventListener("click", () => {
@@ -327,7 +337,7 @@ function initApp() {
       currentIndex--;
       showWord(currentIndex);
       updateNavigationButtons();
-      flipCard.classList.remove("active");
+      flipCardElement.classList.remove("active");
     }
   });
   
@@ -336,7 +346,7 @@ function initApp() {
       currentIndex++;
       showWord(currentIndex);
       updateNavigationButtons();
-      flipCard.classList.remove("active");
+      flipCardElement.classList.remove("active");
     }
   });
   
@@ -347,7 +357,7 @@ function initApp() {
     startMatchingTest();
   });
   
-  closeResults.addEventListener("click", closeResultsModal);
+  closeResultsButton.addEventListener("click", closeResultsModal);
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
