@@ -8,7 +8,7 @@ const words = [
   },
   {
     front: "comfortable",
-    back: "удобный, комфортный",
+    back: "удобный",
     example: "This sofa is very comfortable to sit on."
   },
   {
@@ -28,7 +28,7 @@ const words = [
   },
   {
     front: "journey",
-    back: "путешествие, поездка",
+    back: "путешествие",
     example: "The journey took more than five hours."
   },
   {
@@ -48,201 +48,306 @@ const words = [
   },
   {
     front: "prepare",
-    back: "готовиться, подготавливать",
+    back: "готовиться",
     example: "He needs to prepare for the exam tomorrow."
   }
 ];
 
 let currentIndex = 0;
+let timerInterval = null;
+let startTime = 0;
+let examCardsData = [];
+let firstCard = null;
+let secondCard = null;
+let lock = false;
+let matchedPairs = 0;
+let attempts = [];
+let examActive = false;
 
 const cardFront = document.querySelector("#card-front h1");
 const cardBack = document.querySelector("#card-back h1");
 const cardExample = document.querySelector("#card-back span");
-
 const currentWordSpan = document.getElementById("current-word");
 const totalWordSpan = document.getElementById("total-word");
 const wordProgress = document.getElementById("words-progress");
-
-function showWord(index) {
-    const word = words[index];
-    cardFront.textContent = word.front;
-    cardBack.textContent = word.back;
-    cardExample.textContent = word.example;
-    currentWordSpan.textContent = index + 1;
-    totalWordSpan.textContent = words.length;
-    wordProgress.value = ((index + 1) / words.length) * 100;
-};
-
 const backButton = document.getElementById("back");
 const nextButton = document.getElementById("next");
-
-function updateNavigationButtons() {
-  if (currentIndex === 0) {
-    backButton.disabled = true
-  } else {
-    backButton.disabled = false;
-  };
-  
-  if (currentIndex === words.length - 1) {
-    nextButton.disabled = true;
-  } else {
-    nextButton.disabled = false;
-  };
-};
-
-showWord(currentIndex);
-updateNavigationButtons();
-
-const shuffleWords = document.getElementById("shuffle-words"); 
-
-function makeWordsShuffled(words) {
-  for (let i = words.length - 1; i > 0; i--) {
-    const j = Math.floor (Math.random() * (i + 1));
-    [words[i], words[j]] = [words[j], words[i]];
-  }
-};
-
-shuffleWords.addEventListener("click", () => {
-    makeWordsShuffled(words);
-    currentIndex = 0;
-    showWord(currentIndex);
-    updateNavigationButtons();
-});
-
+const shuffleWords = document.getElementById("shuffle-words");
 const flipCard = document.querySelector(".flip-card");
-
-flipCard.addEventListener("click", () => {
-  flipCard.classList.toggle("active");
-});
-
-backButton.addEventListener("click", () => {
-    if (currentIndex > 0) {
-        currentIndex--;
-        showWord(currentIndex);
-        updateNavigationButtons();
-        flipCard.classList.remove("active");
-    }
-});
-
-nextButton.addEventListener("click", () => {
-  if (currentIndex < words.length - 1) {
-    currentIndex++;
-    showWord(currentIndex);
-    updateNavigationButtons();
-    flipCard.classList.remove("active")
-}
-});
-
 const examButton = document.getElementById("exam");
 const examMode = document.getElementById("exam-mode");
 const studyMode = document.getElementById("study-mode");
 const studyCards = document.querySelector(".study-cards");
 const examCards = document.getElementById("exam-cards");
+const closeResults = document.getElementById("close-results");
 
-examButton.addEventListener("click", () => {
-  studyMode.classList.add("hidden");
-  examMode.classList.remove("hidden");
-  studyCards.classList.add("hidden");
-  examCards.textContent = "Режим тестирования";
+function showWord(index) {
+  const word = words[index];
+  cardFront.textContent = word.front;
+  cardBack.textContent = word.back;
+  cardExample.textContent = word.example;
+  currentWordSpan.textContent = index + 1;
+  totalWordSpan.textContent = words.length;
+  wordProgress.value = ((index + 1) / words.length) * 100;
+}
 
-  startMatchingTest();
-});
+function updateNavigationButtons() {
+  backButton.disabled = currentIndex === 0;
+  nextButton.disabled = currentIndex === words.length - 1;
+}
 
-function createExamCard(card) {
+function shuffleWordsArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function createExamCard(value) {
   const div = document.createElement("div");
   div.classList.add("card", "face-down");
-  div.textContent = card.value;
+  div.textContent = value;
   return div;
-};
+}
 
 function startMatchingTest() {
-    const cards = [];
-    words.forEach((word, index) => {
-        cards.push({ type: "word", value: word.front, newIndex: index });
-        cards.push({ type: "translation", value: word.back, newIndex: index });
-    });
-
-    const cardElements = new Map();
-
-    cards.sort(() => Math.random() - 0.5);
-    examCards.innerHTML = "";
-    
-    const fragment = document.createDocumentFragment();
-    cards.forEach(card => {
-        const div = createExamCard(card);
-        fragment.appendChild(div);
-        cardElements.set(div, card);
+  examActive = true;
+  resetTimer();
+  startTimer();
+  
+  examCardsData = [];
+  matchedPairs = 0;
+  attempts = Array(words.length).fill(0);
+  
+  for (let i = 0; i < words.length; i++) {
+    examCardsData.push({
+      element: createExamCard(words[i].front),
+      type: "word",
+      index: i,
+      value: words[i].front
     });
     
-    examCards.appendChild(fragment);
-
-    setupMatchingLogic(cardElements);
-};
-
-
-function setupMatchingLogic(cards) {
-    let firstCard = null;
-    let secondCard = null;
-    let lock = false;
-    
-    examCards.addEventListener("click", (e) => {
-        if (lock) {
-            return;
-        }
-        const clicked = e.target;
-        if (!clicked.classList.contains("card") || clicked.classList.contains("fade-out")) {
-            return;
-        };
-        if (clicked === firstCard || clicked === secondCard) {
-            return;
-        };
-
-        clicked.classList.remove("face-down");
-        clicked.classList.add("correct");
-
-        if (!firstCard) {
-            firstCard = clicked;
-            return;
-        }
-
-        secondCard = clicked;
-        lock = true;
-
-        const firstData = cardElements.get(firstCard);
-        const secondData = cardElements.get(secondCard);
-
-        if (firstData.newIndex === secondData.newIndex && firstData.type !== secondData.type) {
-            setTimeout(() => {
-                firstCard.classList.add("fade-out");
-                secondCard.classList.add("fade-out");
-                resetSelection();
-                checkCompletion();
-            }, 300);
-        } else {
-            secondCard.classList.add("wrong");
-            setTimeout(() => {
-                secondCard.classList.remove("wrong");
-                firstCard.classList.remove("correct");
-                secondCard.classList.remove("correct");
-                secondCard.classList.add("face-down");
-                firstCard.classList.add("face-down");
-                resetSelection();
-            }, 500);
-        }
+    examCardsData.push({
+      element: createExamCard(words[i].back),
+      type: "translation",
+      index: i,
+      value: words[i].back
     });
+  }
+  
+  shuffleWordsArray(examCardsData);
+  
+  examCards.innerHTML = "";
+  for (let i = 0; i < examCardsData.length; i++) {
+    examCards.appendChild(examCardsData[i].element);
+  }
+  
+  setupMatchingLogic();
+}
 
-    function resetSelection() {
-        firstCard = null;
-        secondCard = null;
-        lock = false;
-    };
-
-    function checkCompletion() {
-        const remaining = [...examCards.children].filter(card => !card.classList.contains("fade-out"));
-        if (remaining.length === 0) {
-            setTimeout(() => {
-                alert("Поздравляем! Вы успешны завершили проверку знаний");
-            }, 300);
-        }
+function setupMatchingLogic() {
+  examCards.addEventListener("click", function(e) {
+    if (lock || !examActive) return;
+    
+    const clicked = e.target;
+    if (!clicked.classList.contains("card") || 
+        clicked.classList.contains("fade-out")) {
+      return;
     }
-};
+    
+    clicked.classList.remove("face-down");
+    
+    if (!firstCard) {
+      firstCard = clicked;
+      firstCard.classList.add("correct");
+      return;
+    }
+    
+    if (clicked === firstCard) return;
+    
+    secondCard = clicked;
+    lock = true;
+    
+    let firstData = null;
+    let secondData = null;
+    
+    for (let i = 0; i < examCardsData.length; i++) {
+      if (examCardsData[i].element === firstCard) {
+        firstData = examCardsData[i];
+      }
+      if (examCardsData[i].element === secondCard) {
+        secondData = examCardsData[i];
+      }
+    }
+    
+    if (firstData && secondData && 
+        firstData.index === secondData.index && 
+        firstData.type !== secondData.type) {
+    
+      attempts[firstData.index]++;
+      matchedPairs++;
+      
+      updateExamProgress();
+      
+      setTimeout(() => {
+        firstCard.classList.add("fade-out");
+        secondCard.classList.add("fade-out");
+        resetSelection();
+        checkCompletion();
+      }, 500);
+    } else {
+      
+      if (firstData) attempts[firstData.index]++;
+      secondCard.classList.add("wrong");
+      
+      setTimeout(() => {
+        
+        firstCard.classList.remove("correct");
+        firstCard.classList.add("face-down");
+        
+        secondCard.classList.remove("wrong");
+        secondCard.classList.add("face-down");
+        
+        resetSelection();
+      }, 1000);
+    }
+  });
+}
+
+function resetSelection() {
+  firstCard = null;
+  secondCard = null;
+  lock = false;
+}
+
+function checkCompletion() {
+  if (matchedPairs === words.length) {
+    examActive = false;
+    stopTimer();
+    setTimeout(() => {
+      showResults();
+    }, 500);
+  }
+}
+
+function updateExamProgress() {
+  const percent = (matchedPairs / words.length) * 100;
+  document.getElementById("correct-percent").textContent = `${Math.round(percent)}%`;
+  document.getElementById("exam-progress").value = percent;
+}
+
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+  const elapsedTime = Date.now() - startTime;
+  const seconds = Math.floor(elapsedTime / 1000);
+  const minutes = Math.floor(seconds / 60);
+  
+  const displaySeconds = seconds % 60;
+  const timeString = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+  
+  document.getElementById("time").textContent = timeString;
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function resetTimer() {
+  stopTimer();
+  document.getElementById("time").textContent = "00:00";
+  document.getElementById("correct-percent").textContent = "0%";
+  document.getElementById("exam-progress").value = 0;
+}
+
+function showResults() {
+  const modal = document.querySelector(".results-modal");
+  const content = document.querySelector(".results-content");
+  const timeElement = document.getElementById("timer");
+  
+  timeElement.textContent = document.getElementById("time").textContent;
+  
+  content.innerHTML = "";
+  
+  for (let i = 0; i < words.length; i++) {
+    const template = document.getElementById("word-stats");
+    const clone = template.content.cloneNode(true);
+    
+    clone.querySelector(".word span").textContent = `${words[i].front} - ${words[i].back}`;
+    clone.querySelector(".attempts span").textContent = attempts[i];
+    
+    content.appendChild(clone);
+  }
+  
+  const overlay = document.createElement("div");
+  overlay.classList.add("overlay");
+  document.body.appendChild(overlay);
+  
+  modal.classList.remove("hidden");
+}
+
+function closeResultsModal() {
+  const modal = document.querySelector(".results-modal");
+  const overlay = document.querySelector(".overlay");
+  
+  modal.classList.add("hidden");
+  if (overlay) {
+    overlay.remove();
+  }
+  
+  studyMode.classList.remove("hidden");
+  examMode.classList.add("hidden");
+  studyCards.classList.remove("hidden");
+  examCards.innerHTML = "";
+  examActive = false;
+}
+
+function initApp() {
+  showWord(currentIndex);
+  updateNavigationButtons();
+  
+  shuffleWords.addEventListener("click", () => {
+    shuffleWordsArray(words);
+    currentIndex = 0;
+    showWord(currentIndex);
+    updateNavigationButtons();
+    flipCard.classList.remove("active");
+  });
+  
+  flipCard.addEventListener("click", () => {
+    flipCard.classList.toggle("active");
+  });
+  
+  backButton.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      showWord(currentIndex);
+      updateNavigationButtons();
+      flipCard.classList.remove("active");
+    }
+  });
+  
+  nextButton.addEventListener("click", () => {
+    if (currentIndex < words.length - 1) {
+      currentIndex++;
+      showWord(currentIndex);
+      updateNavigationButtons();
+      flipCard.classList.remove("active");
+    }
+  });
+  
+  examButton.addEventListener("click", () => {
+    studyMode.classList.add("hidden");
+    examMode.classList.remove("hidden");
+    studyCards.classList.add("hidden");
+    startMatchingTest();
+  });
+  
+  closeResults.addEventListener("click", closeResultsModal);
+}
+
+document.addEventListener('DOMContentLoaded', initApp);

@@ -1,11 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap");
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Roboto", sans-serif;
   min-height: 100vh;
   position: relative;
-  background: #fedee75e;
-  font-family: "Roboto", sans-serif;
+  background: rgba(254, 222, 231, 0.37);
 }
 
 .container {
@@ -35,7 +34,7 @@ body {
   text-align: center;
   transition: transform 0.6s;
   transform-style: preserve-3d;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .flip-card.active .flip-card-inner {
@@ -86,14 +85,14 @@ main {
   flex-shrink: 0;
 }
 
-.motivation {
-  font-weight: bold;
-}
-
 .sidebar {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.motivation {
+  font-weight: bold;
 }
 
 .hidden {
@@ -118,10 +117,6 @@ button {
 
 button:disabled {
   opacity: 0.5;
-}
-
-progress {
-  width: 100%;
 }
 
 .slider-controls {
@@ -155,10 +150,32 @@ progress {
   box-sizing: border-box;
   border: 1px solid #dadbdc;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .card.correct {
   background-color: #98e2e1;
+}
+
+.card.wrong {
+  background-color: #ff4d4d;
+  animation: shake 0.5s;
+}
+
+.card.face-down {
+  background-color: #f8f9fa;
+  color: transparent;
+  position: relative;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.card.face-down::after,
+.card.face-down::before {
+  content: "?";
+  color: #6c757d;
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute;
 }
 
 .fade-out {
@@ -166,9 +183,28 @@ progress {
   animation-fill-mode: forwards;
 }
 
-.card.wrong {
-  background-color: #f3a6be;
-  animation: shake 0.5s;
+.card.fade-out {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 #exam-cards {
@@ -201,8 +237,7 @@ progress {
   transform: translate(-50%, -50%);
   background-color: #fff;
   border: 1px solid #e7e9f5;
-  -webkit-box-shadow: 0 2px 3px 0 rgb(38 45 67 / 2%);
-  box-shadow: 0 2px 3px 0 rgb(38 45 67 / 2%);
+  box-shadow: 0 2px 3px rgb(38 45 67 / 2%);
   border-radius: 3px;
 }
 
@@ -220,75 +255,40 @@ progress {
   font-weight: bold;
 }
 
-@keyframes shake {
-  0% {
-    transform: translate(1px, 1px) rotate(0deg);
-  }
-
-  10% {
-    transform: translate(-1px, -2px) rotate(-1deg);
-  }
-
-  20% {
-    transform: translate(-3px, 0px) rotate(1deg);
-  }
-
-  30% {
-    transform: translate(3px, 2px) rotate(0deg);
-  }
-
-  40% {
-    transform: translate(1px, -1px) rotate(1deg);
-  }
-
-  50% {
-    transform: translate(-1px, 2px) rotate(-1deg);
-  }
-
-  60% {
-    transform: translate(-3px, 1px) rotate(0deg);
-  }
-
-  70% {
-    transform: translate(3px, 1px) rotate(-1deg);
-  }
-
-  80% {
-    transform: translate(-1px, -1px) rotate(1deg);
-  }
-
-  90% {
-    transform: translate(1px, 2px) rotate(0deg);
-  }
-
-  100% {
-    transform: translate(1px, -2px) rotate(-1deg);
-  }
+#close-results {
+  display: block;
+  margin: 20px auto 0;
+  background-color: #da2865;
+  color: white;
+  border: none;
+  padding: 10px 20px;
 }
 
-@keyframes fadeOut {
-  0% {
-    opacity: 1;
+#close-results:hover {
+  background-color: #c12258;
+}
+
+@media (max-width: 768px) {
+  .flip-card {
+    width: 100%;
+    height: auto;
   }
 
-  100% {
-    opacity: 0;
+  .card {
+    font-size: 18px;
   }
-}
 
-.card {
-  transition: all 0.3s ease;
-}
+  .results-modal {
+    width: 90%;
+    max-height: 90%;
+  }
 
-.card.fade-out {
-  opacity: 0;
-  transform: scale(0.8);
-}
+  .sidebar,
+  .motivation {
+    flex-basis: 100%;
+  }
 
-.card.wrong {
-  background-color: #ff4d4d;
-}
-
-.card.correct {
-  background-color: #a0e7a0;
+  main {
+    flex-direction: column;
+  }
 }
